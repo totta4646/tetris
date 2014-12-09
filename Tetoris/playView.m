@@ -17,10 +17,15 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    //バックグラウンド処理
+    NSNotificationCenter*   nc = [NSNotificationCenter defaultCenter];
+    [nc addObserver:self selector:@selector(applicationDidEnterBackground) name:@"applicationDidEnterBackground" object:nil];
+    [nc addObserver:self selector:@selector(applicationWillEnterForeground) name:@"applicationWillEnterForeground" object:nil];
+
     sound = [[playSound alloc]init];
     sound2 = [[playSound alloc]init];
     self.view.backgroundColor = [UIColor whiteColor];
-    changespeed = 0.2;
+    changespeed = 0.02;
     speed = 1.0;
     difficult = 10;
     time = [NSTimer scheduledTimerWithTimeInterval:speed
@@ -220,6 +225,13 @@
         LEVEL++;
         [self levelLavelRewrite];
         [time invalidate];
+        NSLog(@"%f",speed);
+        NSLog(@"%f",changespeed);
+        
+        if(speed == changespeed) {
+            NSLog(@"hoge2");
+            changespeed = changespeed * 0.1;
+        }
         speed -= changespeed;
         time = [NSTimer scheduledTimerWithTimeInterval:speed
                                                 target:self
@@ -273,9 +285,21 @@
     }
 }
 
-//ここの処理の切り分け迷い中
-//
-//
+-(void) gameover {
+    [self currentBlock];
+    int temp, number;
+    for(int i = 0; i < 4; i++){
+        temp = [dropBlockTemp[i] intValue];
+        number = ((temp / 4) * 9 + temp % 4) + (varticalCount) * 9 + aliginCount;
+        if(stageBlock[number] != noneBlock) {
+            for(int i = 0; i < 6; i++){
+                [[self.view viewWithTag:10] removeFromSuperview];
+            }
+            [self stopTetoris];
+            break;
+        }
+    }
+}
 //出現するブロックの決定
 - (void) dropBlockChange: (bool*) blockStatus{
     bottom = false;
@@ -290,30 +314,37 @@
         case 0:
             [self dropPattern1];
             [self drowDropBlock];
+            [self gameover];
             break;
         case 1:
             [self dropPattern2];
             [self drowDropBlock];
+            [self gameover];
             break;
         case 2:
             [self dropPattern3];
             [self drowDropBlock];
+            [self gameover];
             break;
         case 3:
             [self dropPattern4];
             [self drowDropBlock];
+            [self gameover];
             break;
         case 4:
             [self dropPattern5];
             [self drowDropBlock];
+            [self gameover];
             break;
         case 5:
             [self dropPattern6];
             [self drowDropBlock];
+            [self gameover];
             break;
         case 6:
             [self dropPattern7];
             [self drowDropBlock];
+            [self gameover];
             break;
     }
 }
@@ -1307,37 +1338,17 @@
         }
     }
 }
--(void) gameover {
-    for(int i = 2; i < 6; i++ ){
-        if(stageBlock[i] != noneBlock) {
-            for(int i = 0; i < 6; i++){
-                [[self.view viewWithTag:10] removeFromSuperview];
-            }
-            [self stopTetoris];
-            break;
-        }
-    }
-    for(int i = 11; i < 15; i++ ){
-        if(stageBlock[i] != noneBlock) {
-            for(int i = 0; i < 6; i++){
-                [[self.view viewWithTag:10] removeFromSuperview];
-            }
-            [self stopTetoris];
-            break;
-        }
-    }
-}
 -(void) stopTetoris {
     access = [[plistAccess alloc]init];
     [access accessPlist];
-    if (![access.scoreData[0] isEqualToString:@"------"]) {
+    if (![access.scoreData[0] isEqualToString:DEFAULT_SCORE]) {
         if([access.scoreData[0] integerValue] < SCORE) {
             access.scoreData[0] = [NSString stringWithFormat:@"%d",SCORE];
         }
     } else {
         access.scoreData[0] = [NSString stringWithFormat:@"%d",SCORE];
     }
-    if (![access.scoreData[1] isEqualToString:@"------"]) {
+    if (![access.scoreData[1] isEqualToString:DEFAULT_SCORE]) {
         if([access.scoreData[1] integerValue] < LINE) {
             access.scoreData[1] = [NSString stringWithFormat:@"%d",LINE];
         }
@@ -1345,7 +1356,7 @@
         access.scoreData[1] = [NSString stringWithFormat:@"%d",LINE];
         
     }
-    if (![access.scoreData[2] isEqualToString:@"------"]) {
+    if (![access.scoreData[2] isEqualToString:DEFAULT_SCORE]) {
         if([access.scoreData[2] integerValue] < LEVEL) {
             access.scoreData[2] = [NSString stringWithFormat:@"%d",LEVEL];
         }
@@ -1409,6 +1420,7 @@
 }
 //時間で自動的に落ちるメソッド
 -(void)dropedBlock{
+    NSLog(@"hoge");
     if (!gameover) {
     varticalCount++;
     [self arriveBottom];
@@ -1417,4 +1429,42 @@
     }
 }
 
+- (void)applicationDidEnterBackground {
+    [time invalidate];
+}
+- (void)applicationWillEnterForeground {
+    pauseView = [[UIView alloc]initWithFrame:CGRectMake(VIEW_WIDTH * 0.1, VIEW_WIDTH * 0.5, VIEW_WIDTH * 0.8, VIEW_WIDTH * 0.9)];
+    pauseView.backgroundColor = STAGE_COLOR;
+    pauseView.tag = 100;
+    [pauseView.layer setBorderWidth:3];
+    [pauseView.layer setBorderColor:STAGE_COLOR2.CGColor];
+    [self resetButtonBlock];
+    [self.view addSubview:pauseView];
+    pauselabel = [[UILabel alloc]initWithFrame:CGRectMake(0, MINI_CELL_SIZE, VIEW_WIDTH * 0.8, CELL_SIZE*3)];
+    pauselabel.text = @"PAUSE";
+    pauselabel.textAlignment = NSTextAlignmentCenter;
+    pauselabel.font = [UIFont fontWithName:@"AppleGothic" size:30];
+    pauselabel.textColor = STAGE_COLOR3;
+    [pauseView addSubview:pauselabel];
+    RESUMEBUTTON = [[UIButton alloc]initWithFrame:CGRectMake(CELL_SIZE*2.5, CELL_SIZE*5, CELL_SIZE*6, CELL_SIZE*2)];
+    RESUMEBUTTON.opaque = NO;
+    [RESUMEBUTTON.layer setBorderWidth:3];
+    [RESUMEBUTTON.layer setBorderColor:STAGE_COLOR2.CGColor];
+    [RESUMEBUTTON setTitle:@"RESUME" forState:UIControlStateNormal];
+    [RESUMEBUTTON setTitleColor:STAGE_COLOR3 forState:UIControlStateNormal];
+    RESUMEBUTTON.tag = 100;
+    [RESUMEBUTTON addTarget:self action:@selector(resume:)
+           forControlEvents:UIControlEventTouchDown];
+    [pauseView addSubview:RESUMEBUTTON];
+    HOMEBUTTON = [[UIButton alloc]initWithFrame:CGRectMake(CELL_SIZE*2.5, CELL_SIZE*8, CELL_SIZE*6, CELL_SIZE*2)];
+    HOMEBUTTON.opaque = NO;
+    [HOMEBUTTON.layer setBorderWidth:3];
+    [HOMEBUTTON.layer setBorderColor:STAGE_COLOR2.CGColor];
+    [HOMEBUTTON setTitle:@"HOME" forState:UIControlStateNormal];
+    [HOMEBUTTON setTitleColor:STAGE_COLOR3 forState:UIControlStateNormal];
+    HOMEBUTTON.tag = 100;
+    [HOMEBUTTON addTarget:self action:@selector(home:)
+         forControlEvents:UIControlEventTouchDown];
+    [pauseView addSubview:HOMEBUTTON];
+}
 @end
