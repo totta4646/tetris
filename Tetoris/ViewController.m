@@ -22,6 +22,9 @@
     [LobiAPI signupWithBaseName:@"player"
                      completion:^(LobiNetworkResponse *res){
         if (res.error) {
+            [self alert];
+            name = @"NO DATA";
+            [self drowLabel:topview:username :0 :VIEW_HEIGHT/3*2-VIEW_HEIGHT/4 - CELL_SIZE*2/3 -　MINI_CELL_SIZE/2 :VIEW_WIDTH :50 :STAGE_COLOR3 :[@"Your Name:" stringByAppendingString:name]];
             return ;
         }
         name = [res.dictionary objectForKey:@"name"];
@@ -68,7 +71,22 @@
     
 
 }
-
+-(void) alert {
+    UIAlertView *alert =[[UIAlertView alloc]initWithTitle:@"通信エラー"
+                                                  message:@"User Nameの生成に失敗しました"
+                                                 delegate:nil
+                                        cancelButtonTitle:nil
+                                        otherButtonTitles:@"OK", nil];
+    [alert show];
+}
+-(void) alert2 {
+    UIAlertView *alert =[[UIAlertView alloc]initWithTitle:@"User Nameが未入力です"
+                                                  message:@"User Nameを入力してください"
+                                                 delegate:nil
+                                        cancelButtonTitle:nil
+                                        otherButtonTitles:@"OK", nil];
+    [alert show];
+}
 - (BOOL)textFieldShouldReturn:(UITextField *)sender {
     // キーボードを閉じる
     [sender resignFirstResponder];
@@ -178,17 +196,20 @@
 }
 -(void)submit:(UIButton*)button{
     if (![rename.text isEqualToString:@""]) {
-        name = rename.text;
-        [self drowLabel:topview:username :0 :VIEW_HEIGHT/3*2-VIEW_HEIGHT/4 - CELL_SIZE*2/3 -　MINI_CELL_SIZE/2 :VIEW_WIDTH :50 :STAGE_COLOR3 :[@"Your Name:" stringByAppendingString:name]];
         [LobiAPI updateUserName:rename.text
                      completion:^(LobiNetworkResponse *res){
                          if (res.error) {
+                             [self alert];
                              return ;
                          }
+                         name = rename.text;
+                         [self drowLabel:topview:username :0 :VIEW_HEIGHT/3*2-VIEW_HEIGHT/4 - CELL_SIZE*2/3 -　MINI_CELL_SIZE/2 :VIEW_WIDTH :50 :STAGE_COLOR3 :[@"Your Name:" stringByAppendingString:name]];
+
                      }];
+    } else {
+        [self alert2];
     }
     [self removeview];
-
 }
 -(void) removeview {
     for(int i = 0; i < 10; i++){

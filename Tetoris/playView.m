@@ -1365,6 +1365,9 @@
         access.scoreData[2] = [NSString stringWithFormat:@"%d",LEVEL];
     }
     [access.scoreData writeToFile:access.filePath atomically:NO];
+    [time invalidate];
+    gameover = true;
+    [self result];
 
     if (![LobiCore isReady]) {
         return;
@@ -1374,15 +1377,11 @@
                        score:SCORE
                      handler:^(LobiNetworkResponse *res) {
                          if (res.error) {
+                             [self alert];
                              return ;
                          }
                      }];
     }
-
-    
-    [time invalidate];
-    gameover = true;
-    [self result];
 }
 
 -(void) result {
@@ -1492,6 +1491,26 @@
     [HOMEBUTTON addTarget:self action:@selector(home:)
          forControlEvents:UIControlEventTouchDown];
     [pauseView addSubview:HOMEBUTTON];
+}
+-(void) alert {
+    UIAlertView *alert =[[UIAlertView alloc]initWithTitle:@"通信エラー"
+                                                  message:@"ハイスコアの送信に失敗しました"
+                                                 delegate:self
+                                        cancelButtonTitle:nil
+                                        otherButtonTitles:@"RETRY",@"CANCEL" ,nil];
+    [alert show];
+}
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
+    if(buttonIndex == 0) {
+        [LobiAPI sendRanking:@"max_score-56824646"
+                       score:SCORE
+                     handler:^(LobiNetworkResponse *res) {
+                         if (res.error) {
+                             [self alert];
+                             return;
+                         }
+                     }];
+    }
 }
 - (void)applicationWillEnterForeground {
 }

@@ -47,6 +47,19 @@
 -(void)backAction:(UIButton*)button{
     [self dismissViewControllerAnimated:YES completion:nil];
 }
+-(void) alert {
+    UIAlertView *alert =[[UIAlertView alloc]initWithTitle:@"通信エラー"
+                                                  message:@"ランキング取得に失敗しました"
+                                                 delegate:self
+                                        cancelButtonTitle:nil
+                                        otherButtonTitles:@"OK", nil];
+    [alert show];
+}
+-(void)alertView:(UIAlertView*)alertView
+clickedButtonAtIndex:(NSInteger)buttonIndex {
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+
 - (void) writeRanking {
     [LobiAPI getRanking:@"max_score-56824646"
                    type:KLRRankingRangeAll
@@ -55,6 +68,7 @@
                   limit:30
                 handler:^(LobiNetworkResponse *res) {
                     if (res.error) {
+                        [self alert];
                         return ;
                     }
                     int num = 30;
