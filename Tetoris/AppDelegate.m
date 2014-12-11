@@ -16,8 +16,26 @@
 
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    // Override point for customization after application launch.
+    [LobiCore setupClientId:@"aee01759e82f766cf51d64e8afd3263a1e092742" accountBaseName:@"player"];
+
+//    self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+//    // Override point for customization after application launch.
+//    self.window.backgroundColor = [UIColor whiteColor];
+////ViewController → UIViewController
+//    self.window.rootViewController = [[UIViewController alloc] init];
+//    [LobiCore setRootViewController:self.window.rootViewController];
+//    [self .window makeKeyAndVisible];
     return YES;
+}
+
+- (BOOL)application:(UIApplication *)application
+            openURL:(NSURL *)url
+  sourceApplication:(NSString *)sourceApplication
+         annotation:(id)annotation {
+    if ([LobiCore handleOpenURL:url]) {
+        return YES;
+    }
+    return NO;
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {

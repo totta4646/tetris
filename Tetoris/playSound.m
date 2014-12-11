@@ -31,7 +31,7 @@
     [self soundPlay];
 }
 -(void)deleteBlockSound {
-    _bgmpath = [[NSBundle mainBundle] pathForResource:@"ta_ta_suraido05" ofType:@"mp3"];
+    _bgmpath = [[NSBundle mainBundle] pathForResource:@"get" ofType:@"mp3"];
 //    _bgmpath = [[NSBundle mainBundle] pathForResource:@"SE_19" ofType:@"mp3"];
     [self soundPlay2];
 }

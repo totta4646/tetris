@@ -22,12 +22,15 @@
     [nc addObserver:self selector:@selector(applicationDidEnterBackground) name:@"applicationDidEnterBackground" object:nil];
     [nc addObserver:self selector:@selector(applicationWillEnterForeground) name:@"applicationWillEnterForeground" object:nil];
 
+    AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+
+    
     sound = [[playSound alloc]init];
     sound2 = [[playSound alloc]init];
     self.view.backgroundColor = [UIColor whiteColor];
-    changespeed = 0.02;
+    changespeed = 0.1;
     speed = 1.0;
-    difficult = 10;
+    difficult = 20;
     time = [NSTimer scheduledTimerWithTimeInterval:speed
                                             target:self
                                           selector:@selector(dropedBlock)
@@ -50,7 +53,7 @@
     
     
     //stageの描写
-    stage = [[UIView alloc]initWithFrame:CGRectMake(20, VIEW_HEIGHT - CELL_SIZE*20 - MINI_CELL_SIZE/2 + BORDER_WIDTH, CELL_SIZE * 9, CELL_SIZE * 20)];
+    stage = [[UIView alloc]initWithFrame:CGRectMake(0.05333333333333 * VIEW_WIDTH, VIEW_HEIGHT - CELL_SIZE*20 - MINI_CELL_SIZE/2 + BORDER_WIDTH, CELL_SIZE * 9, CELL_SIZE * 20)];
     //    stage.backgroundColor = STAGE_COLOR;
     [stage.layer setBorderColor:STAGE_COLOR2.CGColor];
     [stage.layer setBorderWidth:BORDER_WIDTH * 2];
@@ -88,7 +91,7 @@
     [self drowDropBlock];
 
     //ステージ等の描写
-    holdView = [[UIView alloc]initWithFrame:CGRectMake(20 + CELL_SIZE * 9, VIEW_HEIGHT -CELL_SIZE*20 - MINI_CELL_SIZE/2, CELL_SIZE*3, CELL_SIZE*5)];
+    holdView = [[UIView alloc]initWithFrame:CGRectMake(0.05333333333333 * VIEW_WIDTH + CELL_SIZE * 9, VIEW_HEIGHT -CELL_SIZE*20 - MINI_CELL_SIZE/2, CELL_SIZE*3, CELL_SIZE*5)];
     [[holdView layer] setBorderColor:[STAGE_COLOR2 CGColor]];
     [[holdView layer] setBorderWidth:BORDER_WIDTH];
     holdView.backgroundColor = [UIColor whiteColor];
@@ -99,7 +102,7 @@
     holdtitle.textColor = STAGE_COLOR3;
     holdtitle.textAlignment = NSTextAlignmentCenter;
     [holdView addSubview:holdtitle];
-    scoreboard = [[UIView alloc]initWithFrame:CGRectMake(20 + CELL_SIZE * 9, VIEW_HEIGHT-CELL_SIZE*15 + BORDER_WIDTH - MINI_CELL_SIZE/2, CELL_SIZE*3, CELL_SIZE*15)];
+    scoreboard = [[UIView alloc]initWithFrame:CGRectMake(0.05333333333333 * VIEW_WIDTH + CELL_SIZE * 9, VIEW_HEIGHT-CELL_SIZE*15 + BORDER_WIDTH - MINI_CELL_SIZE/2, CELL_SIZE*3, CELL_SIZE*15)];
     [[scoreboard layer] setBorderColor:[STAGE_COLOR2 CGColor]];
     [[scoreboard layer] setBorderWidth:BORDER_WIDTH];
     scoreboard.backgroundColor = [UIColor whiteColor];
@@ -139,7 +142,7 @@
     levelLabel.textAlignment = NSTextAlignmentCenter;
     [scoreboard addSubview:levelLabel];
     
-    UILabel *pauseLabel = [[UILabel alloc]initWithFrame:CGRectMake(20 + CELL_SIZE*9 - BORDER_WIDTH, h-CELL_SIZE*22.5 - MINI_CELL_SIZE/2, CELL_SIZE*3, CELL_SIZE*2.5)];
+    UILabel *pauseLabel = [[UILabel alloc]initWithFrame:CGRectMake(0.05333333333333 * VIEW_WIDTH + CELL_SIZE*9 - BORDER_WIDTH, h-CELL_SIZE*22.5 - MINI_CELL_SIZE/2, CELL_SIZE*3, CELL_SIZE*2.5)];
     pauseLabel.text = @"PAUSE";
     pauseLabel.textColor = STAGE_COLOR3;
     pauseLabel.backgroundColor = STAGE_COLOR;
@@ -149,7 +152,7 @@
     [self.view addSubview:pauseLabel];
 
 
-    nextView = [[UIView alloc]initWithFrame:CGRectMake(20, VIEW_HEIGHT-CELL_SIZE*22.5 + BORDER_WIDTH - MINI_CELL_SIZE/2, CELL_SIZE*9, CELL_SIZE*2.5)];
+    nextView = [[UIView alloc]initWithFrame:CGRectMake(0.05333333333333 * VIEW_WIDTH, VIEW_HEIGHT-CELL_SIZE*22.5 + BORDER_WIDTH - MINI_CELL_SIZE/2, CELL_SIZE*9, CELL_SIZE*2.5)];
     [[nextView layer] setBorderColor:[STAGE_COLOR2 CGColor]];
     [[nextView layer] setBorderWidth:BORDER_WIDTH];
     nextView.backgroundColor = [UIColor whiteColor];
@@ -162,7 +165,7 @@
     [nextView addSubview:nexttitle];
     [self drowNextBlock];
 
-    UILabel *pauseLabel2 = [[UILabel alloc]initWithFrame:CGRectMake(20 + CELL_SIZE*9, VIEW_HEIGHT-CELL_SIZE*22.5 - MINI_CELL_SIZE/2, BORDER_WIDTH * 5, CELL_SIZE*2.5)];
+    UILabel *pauseLabel2 = [[UILabel alloc]initWithFrame:CGRectMake(0.05333333333333 * VIEW_WIDTH + CELL_SIZE*9, VIEW_HEIGHT-CELL_SIZE*22.5 - MINI_CELL_SIZE/2, BORDER_WIDTH * 5, CELL_SIZE*2.5)];
     pauseLabel2.backgroundColor = STAGE_COLOR2;
     [self.view addSubview:pauseLabel2];
 
@@ -170,41 +173,45 @@
     //ボタン関係
     
     
-    DOWNBUTTON = [[UIButton alloc]initWithFrame:CGRectMake(0, VIEW_HEIGHT/4*3, VIEW_WIDTH, VIEW_HEIGHT/4)];
+    DOWNBUTTON = [[UIButton alloc]initWithFrame:CGRectMake(0, VIEW_HEIGHT-CELL_SIZE*5 + BORDER_WIDTH - MINI_CELL_SIZE/2, VIEW_WIDTH, VIEW_HEIGHT/4)];
     DOWNBUTTON.opaque = NO;
-    //    DOWNBUTTON.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.1];
+    if([appDelegate.mode isEqualToString:@"assist"]){
+        DOWNBUTTON.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.1];
+    }
     DOWNBUTTON.tag = 10;
-    //    DOWNBUTTON.backgroundColor = [UIColor colorWithWhite:1.0f alpha:0.0f]; // transparent background.
     [DOWNBUTTON addTarget:self action:@selector(blockDown:)
          forControlEvents:UIControlEventTouchDown];
     UILongPressGestureRecognizer *gestureRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(longPressedHandler:)];
     [DOWNBUTTON addGestureRecognizer:gestureRecognizer];
     [self.view addSubview:DOWNBUTTON];
-    TURNBUTTON = [[UIButton alloc]initWithFrame:CGRectMake(0, 0, VIEW_WIDTH, VIEW_HEIGHT/4)];
+    TURNBUTTON = [[UIButton alloc]initWithFrame:CGRectMake(0, 0, VIEW_WIDTH, VIEW_HEIGHT-CELL_SIZE*15 + BORDER_WIDTH - MINI_CELL_SIZE/2)];
     TURNBUTTON.opaque = NO;
     TURNBUTTON.tag = 10;
-    //    TURNBUTTON.backgroundColor = [[UIColor greenColor] colorWithAlphaComponent:0.1];
-    //    TURNBUTTON.backgroundColor = [UIColor colorWithWhite:1.0f alpha:0.0f]; // transparent background.
+    if([appDelegate.mode isEqualToString:@"assist"]){
+        TURNBUTTON.backgroundColor = [[UIColor greenColor] colorWithAlphaComponent:0.1];
+    }
     [TURNBUTTON addTarget:self action:@selector(blockTurn:)
          forControlEvents:UIControlEventTouchDown];
     [self.view addSubview:TURNBUTTON];
-    LEFTBUTTON = [[UIButton alloc]initWithFrame:CGRectMake(0, VIEW_HEIGHT/4, VIEW_WIDTH/2, VIEW_HEIGHT/4 *2)];
+    LEFTBUTTON = [[UIButton alloc]initWithFrame:CGRectMake(0, VIEW_HEIGHT-CELL_SIZE*15 + BORDER_WIDTH - MINI_CELL_SIZE/2, VIEW_WIDTH/2, CELL_SIZE* 10)];
     LEFTBUTTON.opaque = NO;
     LEFTBUTTON.tag = 10;
-    //    LEFTBUTTON.backgroundColor = [[UIColor blueColor] colorWithAlphaComponent:0.1];
-    //    LEFTBUTTON.backgroundColor = [UIColor colorWithWhite:1.0f alpha:0.0f]; // transparent background.
+    if([appDelegate.mode isEqualToString:@"assist"]){
+        LEFTBUTTON.backgroundColor = [[UIColor blueColor] colorWithAlphaComponent:0.1];
+    }
     [LEFTBUTTON addTarget:self action:@selector(blockLeft:)
          forControlEvents:UIControlEventTouchDown];
     [self.view addSubview:LEFTBUTTON];
-    RIGHTBUTTON = [[UIButton alloc]initWithFrame:CGRectMake(VIEW_WIDTH / 2, VIEW_HEIGHT/4 , VIEW_WIDTH/2, VIEW_HEIGHT/4 *2)];
+    RIGHTBUTTON = [[UIButton alloc]initWithFrame:CGRectMake(VIEW_WIDTH / 2, VIEW_HEIGHT-CELL_SIZE*15 + BORDER_WIDTH - MINI_CELL_SIZE/2, VIEW_WIDTH/2, CELL_SIZE *10)];
     RIGHTBUTTON.opaque = NO;
     RIGHTBUTTON.tag = 10;
-    //    RIGHTBUTTON.backgroundColor = [[UIColor redColor] colorWithAlphaComponent:0.1];
-    //    RIGHTBUTTON.backgroundColor = [UIColor colorWithWhite:1.0f alpha:0.0f]; // transparent background.
+    if([appDelegate.mode isEqualToString:@"assist"]){
+        RIGHTBUTTON.backgroundColor = [[UIColor redColor] colorWithAlphaComponent:0.1];
+    }
     [RIGHTBUTTON addTarget:self action:@selector(blockRight:)
           forControlEvents:UIControlEventTouchDown];
     [self.view addSubview:RIGHTBUTTON];
-    HOLDBUTTON = [[UIButton alloc]initWithFrame:CGRectMake(20 + CELL_SIZE * 9, VIEW_HEIGHT-CELL_SIZE*20, CELL_SIZE*3, CELL_SIZE*5)];
+    HOLDBUTTON = [[UIButton alloc]initWithFrame:CGRectMake(0.05333333333333 * VIEW_WIDTH + CELL_SIZE * 9, VIEW_HEIGHT-CELL_SIZE*20, CELL_SIZE*3, CELL_SIZE*5)];
     HOLDBUTTON.opaque = NO;
     HOLDBUTTON.tag = 10;
     HOLDBUTTON.backgroundColor = [UIColor colorWithWhite:1.0f alpha:0.0f]; // transparent background.
@@ -212,24 +219,18 @@
          forControlEvents:UIControlEventTouchDown];
     [self.view addSubview:HOLDBUTTON];
     
-    PAUSEBUTTON = [[UIButton alloc]initWithFrame:CGRectMake(20 + CELL_SIZE*9 -2, VIEW_HEIGHT-CELL_SIZE*22.5 - MINI_CELL_SIZE/2, CELL_SIZE*3, CELL_SIZE*2.5)];
+    PAUSEBUTTON = [[UIButton alloc]initWithFrame:CGRectMake(0.05333333333333 * VIEW_WIDTH + CELL_SIZE*9 -2, VIEW_HEIGHT-CELL_SIZE*22.5 - MINI_CELL_SIZE/2, CELL_SIZE*3, CELL_SIZE*2.5)];
     PAUSEBUTTON.tag = 10;
     [PAUSEBUTTON addTarget:self action:@selector(pause:)
           forControlEvents:UIControlEventTouchDown];
-    [self.view addSubview:PAUSEBUTTON];
-    
-    
+    [self.view addSubview:PAUSEBUTTON];    
 }
 -(void) speedChange {
     if (LINE/difficult == LEVEL) {
         LEVEL++;
         [self levelLavelRewrite];
         [time invalidate];
-        NSLog(@"%f",speed);
-        NSLog(@"%f",changespeed);
-        
         if(speed == changespeed) {
-            NSLog(@"hoge2");
             changespeed = changespeed * 0.1;
         }
         speed -= changespeed;
@@ -684,7 +685,7 @@
 //ポーズを消す
 -(void) resetPauseView {
     [sound actionPauseSound];
-    for(int i = 0; i < 4; i++){
+    for(int i = 0; i < 20; i++){
         [[self.view viewWithTag:100] removeFromSuperview];
     }
     [self.view addSubview:DOWNBUTTON];
@@ -735,7 +736,6 @@
 //ポーズ画面表示
 -(void)pause:(UIButton*)button{
     [sound actionPauseSound];
-
     pauseView = [[UIView alloc]initWithFrame:CGRectMake(VIEW_WIDTH * 0.1, VIEW_WIDTH * 0.5, VIEW_WIDTH * 0.8, VIEW_WIDTH * 0.9)];
     pauseView.backgroundColor = STAGE_COLOR;
     pauseView.tag = 100;
@@ -746,6 +746,7 @@
     [self.view addSubview:pauseView];
     pauselabel = [[UILabel alloc]initWithFrame:CGRectMake(0, MINI_CELL_SIZE, VIEW_WIDTH * 0.8, CELL_SIZE*3)];
     pauselabel.text = @"PAUSE";
+    pauselabel.tag = 100;
     pauselabel.textAlignment = NSTextAlignmentCenter;
     pauselabel.font = [UIFont fontWithName:@"AppleGothic" size:30];
     pauselabel.textColor = STAGE_COLOR3;
@@ -1364,48 +1365,60 @@
         access.scoreData[2] = [NSString stringWithFormat:@"%d",LEVEL];
     }
     [access.scoreData writeToFile:access.filePath atomically:NO];
+
+    if (![LobiCore isReady]) {
+        return;
+    }
+    else {
+        [LobiAPI sendRanking:@"max_score-56824646"
+                       score:SCORE
+                     handler:^(LobiNetworkResponse *res) {
+                         if (res.error) {
+                             return ;
+                         }
+                     }];
+    }
+
+    
     [time invalidate];
     gameover = true;
     [self result];
 }
 
 -(void) result {
-    pauseView = [[UIView alloc]initWithFrame:CGRectMake(VIEW_WIDTH * 0.1, VIEW_WIDTH * 0.5, VIEW_WIDTH * 0.8, VIEW_WIDTH * 0.9)];
-    pauseView.backgroundColor = STAGE_COLOR;
-    pauseView.tag = 100;
-    [pauseView.layer setBorderWidth:3];
-    [pauseView.layer setBorderColor:STAGE_COLOR2.CGColor];
+    pauseView2 = [[UIView alloc]initWithFrame:CGRectMake(VIEW_WIDTH * 0.1, VIEW_WIDTH * 0.5, VIEW_WIDTH * 0.8, VIEW_WIDTH * 0.9 + CELL_SIZE*2)];
+    pauseView2.backgroundColor = STAGE_COLOR;
+    [pauseView2.layer setBorderWidth:3];
+    [pauseView2.layer setBorderColor:STAGE_COLOR2.CGColor];
     [self resetButtonBlock];
 
-    [self.view addSubview:pauseView];
+    [self.view addSubview:pauseView2];
     pauselabel = [[UILabel alloc]initWithFrame:CGRectMake(0, MINI_CELL_SIZE, VIEW_WIDTH * 0.8, CELL_SIZE*3)];
     pauselabel.text = @"RESULT";
     pauselabel.textAlignment = NSTextAlignmentCenter;
     pauselabel.font = [UIFont fontWithName:@"AppleGothic" size:30];
     pauselabel.textColor = STAGE_COLOR3;
-    [pauseView addSubview:pauselabel];
-    [pauseView addSubview:RESUMEBUTTON];
+    [pauseView2 addSubview:pauselabel];
     
- 
+
     UILabel *resultScoreLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, CELL_SIZE*3.5, VIEW_WIDTH * 0.8, CELL_SIZE)];
     resultScoreLabel.text = [@"SCORE:" stringByAppendingString:scoreLabel.text] ;
     resultScoreLabel.textAlignment = NSTextAlignmentCenter;
     resultScoreLabel.textColor = STAGE_COLOR3;
-    [pauseView addSubview:resultScoreLabel];
+    [pauseView2 addSubview:resultScoreLabel];
  
     UILabel *resultLineLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, CELL_SIZE*5, VIEW_WIDTH * 0.8, CELL_SIZE)];
     resultLineLabel.text = [@"LINES:" stringByAppendingString:lineLabel.text] ;
     resultLineLabel.textAlignment = NSTextAlignmentCenter;
     resultLineLabel.textColor = STAGE_COLOR3;
-    [pauseView addSubview:resultLineLabel];
+    [pauseView2 addSubview:resultLineLabel];
 
     UILabel *resultLevelLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, CELL_SIZE*6.5, VIEW_WIDTH * 0.8, CELL_SIZE)];
     resultLevelLabel.text = [@"LEVEL:" stringByAppendingString:levelLabel.text] ;
     resultLevelLabel.textAlignment = NSTextAlignmentCenter;
     resultLevelLabel.textColor = STAGE_COLOR3;
-    [pauseView addSubview:resultLevelLabel];
+    [pauseView2 addSubview:resultLevelLabel];
 
-    
     HOMEBUTTON = [[UIButton alloc]initWithFrame:CGRectMake(CELL_SIZE*2.5, CELL_SIZE*8, CELL_SIZE*6, CELL_SIZE*2)];
     HOMEBUTTON.opaque = NO;
     [HOMEBUTTON.layer setBorderWidth:3];
@@ -1415,12 +1428,21 @@
     HOMEBUTTON.tag = 100;
     [HOMEBUTTON addTarget:self action:@selector(home:)
          forControlEvents:UIControlEventTouchDown];
-    [pauseView addSubview:HOMEBUTTON];
-    
+    [pauseView2 addSubview:HOMEBUTTON];
+    RANKINGBUTTON = [[UIButton alloc]initWithFrame:CGRectMake(CELL_SIZE*2.5, CELL_SIZE*10 + MINI_CELL_SIZE, CELL_SIZE*6, CELL_SIZE*2)];
+    RANKINGBUTTON.opaque = NO;
+    [RANKINGBUTTON.layer setBorderWidth:3];
+    [RANKINGBUTTON.layer setBorderColor:STAGE_COLOR2.CGColor];
+    [RANKINGBUTTON setTitle:@"RANKING" forState:UIControlStateNormal];
+    [RANKINGBUTTON setTitleColor:STAGE_COLOR3 forState:UIControlStateNormal];
+    RANKINGBUTTON.tag = 100;
+    [RANKINGBUTTON addTarget:self action:@selector(ranking:)
+            forControlEvents:UIControlEventTouchDown];
+    [pauseView2 addSubview:RANKINGBUTTON];
+
 }
 //時間で自動的に落ちるメソッド
 -(void)dropedBlock{
-    NSLog(@"hoge");
     if (!gameover) {
     varticalCount++;
     [self arriveBottom];
@@ -1428,11 +1450,15 @@
     [self drowDropBlock];
     }
 }
+-(void)ranking:(UIButton*)button{
+    RankingViewController *rankView = [[RankingViewController alloc] init];
+    rankView.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
+    [self presentViewController:rankView animated:YES completion:nil];
+}
+
 
 - (void)applicationDidEnterBackground {
     [time invalidate];
-}
-- (void)applicationWillEnterForeground {
     pauseView = [[UIView alloc]initWithFrame:CGRectMake(VIEW_WIDTH * 0.1, VIEW_WIDTH * 0.5, VIEW_WIDTH * 0.8, VIEW_WIDTH * 0.9)];
     pauseView.backgroundColor = STAGE_COLOR;
     pauseView.tag = 100;
@@ -1466,5 +1492,7 @@
     [HOMEBUTTON addTarget:self action:@selector(home:)
          forControlEvents:UIControlEventTouchDown];
     [pauseView addSubview:HOMEBUTTON];
+}
+- (void)applicationWillEnterForeground {
 }
 @end

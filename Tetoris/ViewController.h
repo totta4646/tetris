@@ -8,17 +8,24 @@
 
 #import <UIKit/UIKit.h>
 #import "playView.h"
+#import "RankingViewController.h"
 #import "constData.h"
 #import "plistAccess.h"
 #import "playSound.h"
 #import "UIColor+Hex.h"
+#import "AppDelegate.h"
+#import <LobiCore/LobiAPI.h>
+#import <LobiRanking/LobiRanking.h>
 
 @interface ViewController : UIViewController {
     UIView *topview,*settingView;
-    UIButton *startButton,*settingButton;
-    UILabel *maxLinesTitle,*hiScoreTitle,*title;
+    UIButton *startButton,*settingButton,*rankingButton,*cancelButton,*okButton,*modeButton;
+    UILabel *maxLinesTitle,*hiScoreTitle,*title,*username;
+    UITextField *rename;
+    NSString *name;
     plistAccess *access;
     playSound *sound;
+    AppDelegate *grobal;
 }
 -(void)drowView;
 @end
