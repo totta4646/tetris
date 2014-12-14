@@ -32,9 +32,17 @@
 }
 -(void)deleteBlockSound {
     _bgmpath = [[NSBundle mainBundle] pathForResource:@"get" ofType:@"mp3"];
-//    _bgmpath = [[NSBundle mainBundle] pathForResource:@"SE_19" ofType:@"mp3"];
     [self soundPlay2];
 }
+
+-(void)bgmSound {
+    _bgmpath = [[NSBundle mainBundle] pathForResource:@"smile" ofType:@"mp3"];
+    [self bgmplay];
+}
+-(void)bgmStop {
+    [_sound3 stop];
+}
+
 
 
 -(void)soundPlay {
@@ -47,5 +55,11 @@
     _bgmurl = [NSURL fileURLWithPath:_bgmpath];
     _sound2 = [[AVAudioPlayer alloc]initWithContentsOfURL:_bgmurl error:nil];
     [_sound2 play];
+}
+-(void)bgmplay {
+    _bgmurl = [NSURL fileURLWithPath:_bgmpath];
+    _sound3 = [[AVAudioPlayer alloc]initWithContentsOfURL:_bgmurl error:nil];
+    _sound3.numberOfLoops = -1;
+    [_sound3 play];
 }
 @end

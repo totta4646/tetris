@@ -61,6 +61,10 @@ clickedButtonAtIndex:(NSInteger)buttonIndex {
 }
 
 - (void) writeRanking {
+    if (![LobiCore isReady]) {
+        [self alert];
+        return;
+    }
     [LobiAPI getRanking:@"max_score-56824646"
                    type:KLRRankingRangeAll
                  origin:KLRRankingCursorOriginTop

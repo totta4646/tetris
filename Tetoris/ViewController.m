@@ -18,7 +18,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];    
     grobal = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-
+    modeTemp = @"normal";
     [LobiAPI signupWithBaseName:@"player"
                      completion:^(LobiNetworkResponse *res){
         if (res.error) {
@@ -80,8 +80,8 @@
     [alert show];
 }
 -(void) alert2 {
-    UIAlertView *alert =[[UIAlertView alloc]initWithTitle:@"User Nameが未入力です"
-                                                  message:@"User Nameを入力してください"
+    UIAlertView *alert =[[UIAlertView alloc]initWithTitle:@"通信エラー"
+                                                  message:@"User Nameをの変更に失敗しました"
                                                  delegate:nil
                                         cancelButtonTitle:nil
                                         otherButtonTitles:@"OK", nil];
@@ -179,39 +179,44 @@
 
     [sound actionBlockSound];
 
-    [self drowButton:settingView :modeButton :VIEW_WIDTH * 0.4  - VIEW_WIDTH * 0.02:MINI_CELL_SIZE * 2 + CELL_SIZE * 3 :VIEW_WIDTH * 0.39:CELL_SIZE*1.5 :STAGE_COLOR :STAGE_COLOR3 :@"NORMAL MODE" :STAGE_COLOR2 :2.0 : @selector(change:)];
-    grobal.mode = @"normal";
+    if(grobal.mode != @"assist") {
+        [self drowButton:settingView :modeButton :VIEW_WIDTH * 0.4  - VIEW_WIDTH * 0.02:MINI_CELL_SIZE * 2 + CELL_SIZE * 3 :VIEW_WIDTH * 0.39:CELL_SIZE*1.5 :STAGE_COLOR :STAGE_COLOR3 :@"NORMAL MODE" :STAGE_COLOR2 :2.0 : @selector(change:)];
+    } else {
+        [self drowButton:settingView :modeButton :VIEW_WIDTH * 0.4 - VIEW_WIDTH * 0.02:MINI_CELL_SIZE * 2 + CELL_SIZE * 3 :VIEW_WIDTH * 0.39:CELL_SIZE*1.5 :STAGE_COLOR :STAGE_COLOR3 :@"ASSIST MODE" :STAGE_COLOR2 :2.0 : @selector(change2:)];
+    }
 }
 -(void)change:(UIButton*)button{
+    [sound actionBlockSound];
     [self drowButton:settingView :modeButton :VIEW_WIDTH * 0.4 - VIEW_WIDTH * 0.02:MINI_CELL_SIZE * 2 + CELL_SIZE * 3 :VIEW_WIDTH * 0.39:CELL_SIZE*1.5 :STAGE_COLOR :STAGE_COLOR3 :@"ASSIST MODE" :STAGE_COLOR2 :2.0 : @selector(change2:)];
-    grobal.mode = @"assist";
+    modeTemp = @"assist";
 }
 -(void)change2:(UIButton*)button{
     [self drowButton:settingView :modeButton :VIEW_WIDTH * 0.4 - VIEW_WIDTH * 0.02:MINI_CELL_SIZE * 2 + CELL_SIZE * 3 :VIEW_WIDTH * 0.39:CELL_SIZE*1.5 :STAGE_COLOR :STAGE_COLOR3 :@"NORMAL MODE" :STAGE_COLOR2 :2.0 : @selector(change:)];
-    grobal.mode = @"normal";
+    modeTemp = @"normal";
 }
 
 -(void)cancel:(UIButton*)button{
     [self removeview];
 }
 -(void)submit:(UIButton*)button{
+    
     if (![rename.text isEqualToString:@""]) {
         [LobiAPI updateUserName:rename.text
                      completion:^(LobiNetworkResponse *res){
                          if (res.error) {
-                             [self alert];
+                             [self alert2];
                              return ;
                          }
                          name = rename.text;
                          [self drowLabel:topview:username :0 :VIEW_HEIGHT/3*2-VIEW_HEIGHT/4 - CELL_SIZE*2/3 -　MINI_CELL_SIZE/2 :VIEW_WIDTH :50 :STAGE_COLOR3 :[@"Your Name:" stringByAppendingString:name]];
 
                      }];
-    } else {
-        [self alert2];
     }
+    grobal.mode = modeTemp;
     [self removeview];
 }
 -(void) removeview {
+    [sound actionBlockSound];
     for(int i = 0; i < 10; i++){
         [[self.view viewWithTag:100] removeFromSuperview];
     }
@@ -222,11 +227,13 @@
     view.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
     view.delegate = self;
     [sound moveViewSound];
+    [sound bgmSound];
     [self presentModalViewController:view animated:YES];
 }
 
 //画面が返ってきたときのメソッド
 -(void) modalViewWillClose {
+    [sound bgmStop];
     [access accessPlist];
     hiScoreTitle.text = [@"HI-SCORE:" stringByAppendingString:access.scoreData[0]];
     maxLinesTitle.text = [@"MAX-LINES:" stringByAppendingString:access.scoreData[1]];

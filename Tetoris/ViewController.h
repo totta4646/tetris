@@ -22,7 +22,7 @@
     UIButton *startButton,*settingButton,*rankingButton,*cancelButton,*okButton,*modeButton;
     UILabel *maxLinesTitle,*hiScoreTitle,*title,*username;
     UITextField *rename;
-    NSString *name;
+    NSString *name,*modeTemp;
     plistAccess *access;
     playSound *sound;
     AppDelegate *grobal;

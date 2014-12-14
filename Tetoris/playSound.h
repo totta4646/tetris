@@ -12,11 +12,13 @@
 @interface playSound : NSObject
 @property NSString *bgmpath;
 @property NSURL *bgmurl;
-@property AVAudioPlayer *sound,*sound2;
+@property AVAudioPlayer *sound,*sound2,*sound3;
 -(void)moveViewSound;
 -(void)actionBlockSound;
 -(void)actionPauseSound;
 -(void)holdBlockSound;
 -(void)deleteBlockSound;
 -(void)arriveBlockSound;
+-(void)bgmSound;
+-(void)bgmStop;
 @end
